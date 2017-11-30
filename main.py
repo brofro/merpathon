@@ -1,1 +1,1 @@
-print ("We have no ideas")
+print ("We have no ideas!!!")

@@ -7,13 +7,18 @@ from slackclient import SlackClient
 ID = ''
 TOKEN = ''
 AT_BOT = "<@" + ID + ">"
-commands = {"dog":dog.dog}
 
+#add key value pair "string" - delegate
+#make sure that your function delegate is imported
+commands = {"dog":dog.dog}
 slackclient = SlackClient(TOKEN)
 
 
 
 def message_parser(message):
+    '''
+    get the message, check if message contains @bot split it by command and channel
+    '''
     outlist = message
     if outlist and len(outlist) > 0:
         for out in outlist:
@@ -23,6 +28,9 @@ def message_parser(message):
     return None, None
 
 def command_handler(command, channel):
+    '''
+    if command is in the list of available commands, call the stored function delegate in the dictionary matching this command
+    '''
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
     if command in commands:
         response = commands[command]()

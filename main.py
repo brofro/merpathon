@@ -7,7 +7,7 @@ from slackclient import SlackClient
 ID = ''
 TOKEN = ''
 AT_BOT = "<@" + ID + ">"
-dogCommand = "dog"
+commands = {"dog":dog.dog}
 
 slackclient = SlackClient(TOKEN)
 
@@ -24,8 +24,8 @@ def message_parser(message):
 
 def command_handler(command, channel):
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
-    if command.startswith(dogCommand):
-        response = dog.dog()
+    if command in commands:
+        response = commands[command]()
     slackclient.api_call("chat.postMessage", channel = channel, text = response, as_user=True)
 
 if __name__ == "__main__":

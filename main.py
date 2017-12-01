@@ -3,6 +3,7 @@ import tokens
 import time
 import requests
 import dog
+import random
 from slackclient import SlackClient
 
 ID = tokens.id
@@ -13,6 +14,9 @@ AT_BOT = "<@" + ID + ">"
 #make sure that your function delegate is imported
 commands = {"dog":dog.dog}
 slackclient = SlackClient(TOKEN)
+validUsers = ["travis.cheng", "bigexecutivestud", "andrew", "jette"]
+members =[]
+
 
 
 
@@ -35,11 +39,21 @@ def command_handler(command, channel):
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
     if command in commands:
         response = commands[command]()
-    slackclient.api_call("chat.postMessage", channel = channel, text = response, as_user=True)
+    slackclient.api_call("chat.postMessage", channel = random.choice(members), text = response, as_user=True)
+
+def get_members():
+    call = slackclient.api_call("users.list")
+    if call.get('ok'):
+        users = call.get('members')
+        for user in users:
+            if 'name' in user and user.get('name') in validUsers:
+                members.append(user.get('id'))
+
 
 if __name__ == "__main__":
     if slackclient.rtm_connect():
         print ("RUNNING")
+        get_members()
         while True:
             command, channel = message_parser(slackclient.rtm_read())
             if command and channel:

@@ -4,8 +4,8 @@ import requests
 
 from slackclient import SlackClient
 
-ID = 'U87G2SS8Z'
-TOKEN = 'xoxb-279546910305-zuI5EpxGUMXkw2QgRsppGTAt'
+ID = ''
+TOKEN = ''
 AT_BOT = "<@" + ID + ">"
 dogCommand = "dog"
 

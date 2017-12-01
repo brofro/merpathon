@@ -3,11 +3,11 @@ import time
 import requests
 import dog
 from slackclient import SlackClient
+#ID and Token needs to be added to file before running
 
-ID = ''
-TOKEN = ''
+ID = 'U87G2SS8Z'
+TOKEN = 'xoxb-279546910305-zuI5EpxGUMXkw2QgRsppGTAt'
 AT_BOT = "<@" + ID + ">"
-dogCommand = "dog"
 
 slackclient = SlackClient(TOKEN)
 
@@ -24,7 +24,7 @@ def message_parser(message):
 
 def command_handler(command, channel):
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
-    if command.startswith(dogCommand):
+    if command.startswith(dog.dogCommandWord()):
         response = dog.dog()
     slackclient.api_call("chat.postMessage", channel = channel, text = response, as_user=True)
 

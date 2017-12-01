@@ -1,11 +1,12 @@
 import os
+import tokens
 import time
 import requests
 import dog
 from slackclient import SlackClient
 
-ID = ''
-TOKEN = ''
+ID = tokens.id
+TOKEN = tokens.key
 AT_BOT = "<@" + ID + ">"
 
 #add key value pair "string" - delegate

@@ -12,12 +12,11 @@ AT_BOT = "<@" + ID + ">"
 
 #add key value pair "string" - delegate
 #make sure that your function delegate is imported
-commands = {"dog":dog.dog}
+commands = {"dog":dog.dog, "goodboye":dog.goodboye, "nothx":dog.nothx}
 slackclient = SlackClient(TOKEN)
 validUsers = ["travis.cheng", "bigexecutivestud", "andrew", "jette"]
 members =[]
-
-
+pointUsers = {}
 
 
 def message_parser(message):
@@ -29,17 +28,29 @@ def message_parser(message):
         for out in outlist:
             if out and 'text' in out and AT_BOT in out['text']:
                 return out['text'].split(AT_BOT)[1].strip().lower(), \
-                    out['channel']
-    return None, None
+                    out['channel'], out['user']
+    return None, None, None
 
-def command_handler(command, channel):
+def command_handler(command, channel, user):
     '''
     if command is in the list of available commands, call the stored function delegate in the dictionary matching this command
     '''
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
     if command in commands:
         response = commands[command]()
-    slackclient.api_call("chat.postMessage", channel = random.choice(members), text = response, as_user=True)
+        if isinstance(response, (int)):
+            pointUsers[user] = pointUsers[user] + response
+            postMessage("THANKS FOR RESPONSE", user)
+        else:
+            postMessage(response)
+    postMessage(response, user)
+
+def postMessage(message, user=None):
+    if user is None:
+        slackclient.api_call("chat.postMessage", channel = random.choice(members), text = message, as_user=True)
+    else:
+        slackclient.api_call("chat.postMessage", channel = user, text = message, as_user=True)
+
 
 def get_members():
     call = slackclient.api_call("users.list")
@@ -48,6 +59,10 @@ def get_members():
         for user in users:
             if 'name' in user and user.get('name') in validUsers:
                 members.append(user.get('id'))
+    
+    if members:
+        for member in members:
+            pointUsers[member] = 0
 
 
 if __name__ == "__main__":
@@ -55,8 +70,8 @@ if __name__ == "__main__":
         print ("RUNNING")
         get_members()
         while True:
-            command, channel = message_parser(slackclient.rtm_read())
+            command, channel, user = message_parser(slackclient.rtm_read())
             if command and channel:
-                command_handler(command, channel)
+                command_handler(command, channel, user)
             time.sleep(1)
             

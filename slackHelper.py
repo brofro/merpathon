@@ -45,7 +45,7 @@ class Slack:
             for out in message:
                 if out and 'text' in out:
                     #if dm, store dm
-                    if self.isChannelDM(out['channel']):
+                    if self.isChannelDM(out['channel']) and out['channel'] not in self.channelInfos:
                         self.channelInfos[out['channel']] = True
                         self.pointUsers[out['user']] = 0
                     # if channel is stored as dm

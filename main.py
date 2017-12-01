@@ -6,6 +6,7 @@ import dog
 import random
 from slackclient import SlackClient
 
+#Constants
 ID = tokens.id
 TOKEN = tokens.key
 AT_BOT = "<@" + ID + ">"
@@ -14,35 +15,43 @@ AT_BOT = "<@" + ID + ">"
 #make sure that your function delegate is imported
 commands = {"dog":dog.dog, "goodboye":dog.goodboye, "nothx":dog.nothx}
 slackclient = SlackClient(TOKEN)
-validUsers = ["travis.cheng", "bigexecutivestud", "andrew", "jette"]
+validUsers = ["jette"]
 members =[]
 pointUsers = {}
 
+channelInfos = {}
 
 def message_parser(message):
-    '''
-    get the message, check if message contains @bot split it by command and channel
-    '''
     outlist = message
     if outlist and len(outlist) > 0:
         for out in outlist:
-            if out and 'text' in out and AT_BOT in out['text']:
-                return out['text'].split(AT_BOT)[1].strip().lower(), \
+            #check if command is directed at bot and has text
+            if out and 'text' in out:
+                if channelInfos.get(out['channel']):
+                    #existing dm conversation
+                    return out['text'].lower(), out['channel'], out['user']
+                if AT_BOT in out['text']:
+                    #return command, channel, users
+                    return out['text'].split(AT_BOT)[1].strip().lower(), \
                     out['channel'], out['user']
     return None, None, None
 
 def command_handler(command, channel, user):
-    '''
-    if command is in the list of available commands, call the stored function delegate in the dictionary matching this command
-    '''
+    #default response
     response = "I'M MR MESEEKS LOOK AT ME, IDK WHAT YOU MEAN"
+    
+    #if valid command
     if command in commands:
         response = commands[command]()
+        #if response resolves to score
         if isinstance(response, (int)):
+            #add score to dict
             pointUsers[user] = pointUsers[user] + response
             postMessage("THANKS FOR RESPONSE", user)
+            return
         else:
             postMessage(response)
+            return
     postMessage(response, user)
 
 def postMessage(message, user=None):
@@ -50,6 +59,9 @@ def postMessage(message, user=None):
         slackclient.api_call("chat.postMessage", channel = random.choice(members), text = message, as_user=True)
     else:
         slackclient.api_call("chat.postMessage", channel = user, text = message, as_user=True)
+
+def channelInfo(channel):
+    channelInfos[channel] = slackclient.api_call("conversations.info", channel = channel).get('channel').get('is_im', False)
 
 
 def get_members():
@@ -72,6 +84,7 @@ if __name__ == "__main__":
         while True:
             command, channel, user = message_parser(slackclient.rtm_read())
             if command and channel:
+                channelInfo(channel)
                 command_handler(command, channel, user)
             time.sleep(1)
             

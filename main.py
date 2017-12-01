@@ -30,7 +30,7 @@ def command_handler(command, channel, user):
         if isinstance(response, (int)):
             #add score to dict
             slack.pointUsers[user] = slack.pointUsers[user] + response
-            slack.postMessage("THANKS FOR RESPONSE | SCORE " + slack.pointUsers[user], user)
+            slack.postMessage("THANKS FOR RESPONSE | SCORE " + str(slack.pointUsers[user]), user)
             return
         else:
             slack.postMessage(response)
